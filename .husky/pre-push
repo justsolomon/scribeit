@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd frontend && ./bin/lint
+cd ../backend && ./bin/lint
+cd .. && ./bin/check-branch

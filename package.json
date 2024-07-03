@@ -1,0 +1,9 @@
+{
+  "name": "app",
+  "scripts": {
+    "prepare": "husky && chmod -R ug+x .husky && chmod -R u+x bin && chmod -R u+x backend/bin && chmod -R u+x frontend/bin"
+  },
+  "dependencies": {
+    "husky": "^9.0.11"
+  }
+}

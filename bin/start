@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+(cd backend && fastapi dev src/app.py) & 
+(cd frontend && yarn start)

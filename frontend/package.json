@@ -1,0 +1,102 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --passWithNoTests --watchAll=false",
+    "test-coverage": "yarn test --coverage --collectCoverageFrom=src/**/*.{ts,tsx}",
+    "eject": "react-scripts eject",
+    "format": "prettier --config .prettierrc src --write"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.7.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.2",
+    "react-scripts": "5.0.1",
+    "redux": "^4.2.1",
+    "redux-logger": "^3.0.6"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^12.0.0",
+    "@types/react": "^18.2.17",
+    "@types/react-dom": "^18.2.7",
+    "@types/react-redux": "^7.1.25",
+    "@types/redux-logger": "^3.0.9",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "lint-staged": "^11.2.6",
+    "prettier": "^2.4.1",
+    "typescript": "^4.1.2"
+  },
+  "eslintConfig": {
+    "plugins": [
+      "prettier"
+    ],
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "singleQuote": true,
+          "trailingComma": "all",
+          "arrowParens": "always",
+          "endOfLine": "auto"
+        }
+      ],
+      "no-console": [
+        "warn"
+      ]
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,html,css,scss}": "yarn format"
+  },
+  "jest": {
+    "testMatch": [
+      "**/__tests__/*.test.ts",
+      "**/__tests__/*.test.tsx"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 0,
+        "statements": 0
+      }
+    },
+    "coveragePathIgnorePatterns": [
+      "node_modules",
+      ".type.ts",
+      ".d.ts",
+      "<rootDir>/src/index.tsx",
+      "<rootDir>/src/service-worker.ts",
+      "<rootDir>/src/serviceWorkerRegistration.ts",
+      "<rootDir>/src/redux",
+      "<rootDir>/src/validators",
+      "<rootDir>/src/pages"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
