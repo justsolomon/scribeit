@@ -1,4 +1,6 @@
-#
+# ScribeIt!
+
+Repo for ScribeIt! app
 
 ## Getting Started
 
@@ -20,7 +22,7 @@ To run the app locally, follow the steps below:
 2. After cloning, navigate into the repo using the command:
 
    ```
-   cd
+   cd scribeit
    ```
 
 3. At the root of the repo, install the dependencies in the `package.json` using the command:
@@ -35,15 +37,21 @@ To run the app locally, follow the steps below:
    ./bin/create-venv
    ```
 
-5. After creating the virtual environment, you can setup the project using the command:
+5. After creating the virtual environment, activate it using the command:
 
    ```
-   source backend/.venv/bin/activate && ./bin/setup
+   source backend/.venv/bin/activate
    ```
 
-6. Once the command above runs, a new `.env` file will be generated at the root of both the `backend` and `frontend` folders. Configure your environment variables with your values in the `backend/.env` and `frontend/.env` files.
+6. Once you are in the virtual environment, you can setup the project using the command:
 
-7. After adding the environment variables, run the app in your terminal using the command:
+   ```
+   ./bin/setup
+   ```
+
+7. Once the command above runs, a new `.env` file will be generated at the root of both the `backend` and `frontend` folders. Configure your environment variables with your values in the `backend/.env` and `frontend/.env` files.
+
+8. After adding the environment variables, run the app in your terminal using the command:
 
    ```
    source backend/.venv/bin/activate && ./bin/start

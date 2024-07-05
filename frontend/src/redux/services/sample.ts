@@ -20,6 +20,6 @@ const sampleApi = createApi({
   }),
 });
 
-export const { useHomeQuery } = sampleApi;
+export const { useLazyHomeQuery } = sampleApi;
 
 export default sampleApi;
