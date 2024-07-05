@@ -9,6 +9,7 @@ let middleware: Middleware[] = [sampleApi.middleware, errorHandlerMiddleware];
 
 // remove logger in production mode
 if (process.env.NODE_ENV !== 'production') {
+  //@ts-ignore
   middleware = [...middleware, logger];
 }
 

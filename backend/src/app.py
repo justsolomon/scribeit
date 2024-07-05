@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import items
-from dotenv import dotenv_values
+from .services import websocket as websocket_service
 
-config = dotenv_values(".env")
 
 app = FastAPI(title="API", description="API description", version="1.0.0")
 
@@ -18,6 +17,10 @@ app.add_middleware(
 
 app.include_router(items.router)
 
+
 @app.get("/")
 def read_root():
+    websocket_service.publish_event(
+        "test", "test-event", {"message": "Hello from Pusher!"}
+    )
     return {"Hello": "World"}

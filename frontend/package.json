@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.7.1",
+    "pusher-js": "^8.4.0-rc2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.1.2",
@@ -20,10 +21,11 @@
     "redux-logger": "^3.0.6"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.15",
+    "@testing-library/dom": "^10.3.0",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^29.5.12",
     "@types/node": "^12.0.0",
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",
@@ -33,6 +35,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "lint-staged": "^11.2.6",
     "prettier": "^2.4.1",
+    "pusher-js-mock": "^0.3.8",
     "typescript": "^4.1.2"
   },
   "eslintConfig": {
