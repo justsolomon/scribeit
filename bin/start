@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
 
-(cd backend && fastapi dev src/app.py) & 
+(cd backend && ./bin/start) & 
 (cd frontend && yarn start)
