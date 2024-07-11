@@ -12,7 +12,7 @@ def upload_video(req: Request, video: UploadFile = File(...)):
     raise HTTPException(status_code=404, detail="Item not found")
     try:
         contents = video.file.read()
-        with open("videos/" + video.filename, 'wb') as f:
+        with open("videos/" + video.filename, "wb") as f:
             f.write(contents)
     except Exception:
         return {"message": "There was an error uploading the file"}
@@ -20,5 +20,3 @@ def upload_video(req: Request, video: UploadFile = File(...)):
         video.file.close()
 
     return {"message": f"Successfully uploaded {video.filename}"}
-
-   
