@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import items
+from .routes import video
 from .config import database, pusher
 import asyncio
 from redis import Redis
@@ -41,7 +41,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(items.router)
+app.include_router(video.router)
 
 
 @app.get("/")

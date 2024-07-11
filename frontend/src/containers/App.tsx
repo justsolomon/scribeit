@@ -1,30 +1,35 @@
 import { usePusher } from 'hooks';
 import { useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
+import { Provider as ReduxProvider } from 'react-redux';
 import { useLazyHomeQuery } from 'redux/services';
 import store from 'redux/store';
 import PusherProvider from './Pusher';
+import { ChakraProvider } from '@chakra-ui/react';
+import UploadVideo from './UploadVideo';
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <PusherProvider>
-        <APITest />
-      </PusherProvider>
-    </Provider>
+    <ReduxProvider store={store}>
+      <ChakraProvider>
+        <PusherProvider>
+          <APITest />
+        </PusherProvider>
+      </ChakraProvider>
+    </ReduxProvider>
   );
 };
 
 export default App;
 
 const APITest = () => {
-  const [fetchData, { data, isLoading, isSuccess }] = useLazyHomeQuery();
+  const [fetchData, { data, isLoading, isSuccess, error }] = useLazyHomeQuery();
 
   return (
     <>
       {isLoading ? <div>Loading...</div> : null}
       {isSuccess ? <div>{JSON.stringify(data)}</div> : null}
       <WebsocketTest fetchData={fetchData} />
+      <UploadVideo />
     </>
   );
 };

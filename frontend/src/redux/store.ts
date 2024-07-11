@@ -1,11 +1,15 @@
 import { Middleware } from 'redux';
-import { sampleApi } from './services';
+import { sampleApi, videoApi } from './services';
 import { configureStore } from '@reduxjs/toolkit';
 import { errorHandlerMiddleware } from './middleware';
 import logger from 'redux-logger';
 import rootReducer from './rootReducer';
 
-let middleware: Middleware[] = [sampleApi.middleware, errorHandlerMiddleware];
+let middleware: Middleware[] = [
+  sampleApi.middleware,
+  videoApi.middleware,
+  errorHandlerMiddleware,
+];
 
 // remove logger in production mode
 if (process.env.NODE_ENV !== 'production') {
