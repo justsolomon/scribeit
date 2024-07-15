@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str
 
     ASYNCIO_DELAY: int
+    FILE_SIZE_LIMIT: int
+    MAX_QUEUE_LENGTH: int
 
     model_config = SettingsConfigDict(env_file="./.env", env_file_encoding="utf-8")
 

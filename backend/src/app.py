@@ -6,7 +6,7 @@ from .config import database, pusher
 import asyncio
 from redis import Redis
 from collections import deque
-from .utils.queue import print_task
+from .utils.queue import video_to_audio, transcribe_audio, remove_unused_files
 from pusher import Pusher
 
 
@@ -18,9 +18,16 @@ async def lifespan(app: FastAPI):
     # initialize pusher client
     app.pusher_client = Pusher(**pusher.pusher_config)
 
-    # initialize processing queue
-    app.queue = deque()
-    asyncio.create_task(print_task(app.queue))
+    # initialize processing queues
+    app.video_queue = deque()
+    app.audio_queue = deque()
+
+    # start processing tasks
+    asyncio.create_task(
+        video_to_audio(app.video_queue, app.audio_queue, app.pusher_client)
+    )
+    asyncio.create_task(transcribe_audio(app.audio_queue, app.pusher_client))
+    asyncio.create_task(remove_unused_files(app.video_queue, app.audio_queue))
 
     yield
 

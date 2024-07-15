@@ -1,9 +1,8 @@
-import { sampleApi, videoApi } from './services';
-import { sample } from './slices';
+import { videoApi } from './services';
+import { auth } from './slices';
 
 const rootReducer = {
-  sample,
-  [sampleApi.reducerPath]: sampleApi.reducer,
+  auth,
   [videoApi.reducerPath]: videoApi.reducer,
 };
 
