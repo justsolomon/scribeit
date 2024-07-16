@@ -1,3 +1,3 @@
-export * from './sample';
+export * from './auth';
 
-export { default as sample } from './sample';
+export { default as auth } from './auth';
