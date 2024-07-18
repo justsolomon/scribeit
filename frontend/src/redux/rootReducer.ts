@@ -1,8 +1,9 @@
 import { videoApi } from './services';
-import { auth } from './slices';
+import { auth, video } from './slices';
 
 const rootReducer = {
   auth,
+  video,
   [videoApi.reducerPath]: videoApi.reducer,
 };
 

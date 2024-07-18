@@ -13,7 +13,7 @@ const useAuth = () => {
     if (user) {
       dispatch(setActiveUser(JSON.parse(user)));
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateUser = (newUser: Partial<User>) => {
     dispatch(setActiveUser({ ...user, ...newUser }));
