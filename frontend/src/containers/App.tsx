@@ -1,15 +1,19 @@
 import { Provider as ReduxProvider } from 'react-redux';
+import { ChakraProvider } from '@chakra-ui/react';
 import store from 'redux/store';
 import PusherProvider from './Pusher';
-import { ChakraProvider } from '@chakra-ui/react';
-import UploadVideo from './UploadVideo';
+import '@vidstack/react/player/styles/default/theme.css';
+import '@vidstack/react/player/styles/default/layouts/video.css';
+import '@vidstack/react/player/styles/base.css';
+import '@vidstack/react/player/styles/plyr/theme.css';
+import AppContent from './AppContent';
 
 const App = () => {
   return (
     <ReduxProvider store={store}>
       <ChakraProvider>
         <PusherProvider>
-          <UploadVideo />
+          <AppContent />
         </PusherProvider>
       </ChakraProvider>
     </ReduxProvider>

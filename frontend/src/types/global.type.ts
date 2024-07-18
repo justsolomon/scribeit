@@ -2,6 +2,10 @@ export interface User {
   id: string;
 }
 
+export interface APIDefaultResponse {
+  message: string;
+}
+
 export interface APIDefaultErrorDetail {
   msg: string;
   type: 'value_error' | 'less_than';

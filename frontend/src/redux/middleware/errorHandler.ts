@@ -17,7 +17,7 @@ const errorHandler: Middleware = (api: MiddlewareAPI) => (next) => (action) => {
       errorType = getAPIErrorType(action.payload as APIErrorResponse);
     }
 
-    if (!errorType) {
+    if (!errorType && errorMessage) {
       toastErrorMessage(errorMessage);
     }
   }

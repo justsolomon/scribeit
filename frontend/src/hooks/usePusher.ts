@@ -1,9 +1,23 @@
 import { PusherContext } from 'containers';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import useAuth from './useAuth';
 
 const usePusher = () => {
   const pusherInstance = useContext(PusherContext);
   const [subscribedChannels, setSubscribedChannels] = useState(new Set());
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const userId = user?.id;
+
+    if (pusherInstance && userId) {
+      subscribe(userId);
+    }
+
+    return () => {
+      unsubscribe(userId);
+    };
+  }, [pusherInstance, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const subscribe = (channelName: string) => {
     if (pusherInstance && !pusherInstance.channel(channelName)) {
