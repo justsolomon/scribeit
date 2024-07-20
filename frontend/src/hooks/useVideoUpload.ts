@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import {
+  resetTranscriptionState,
   setIsVideoUploadStarted,
   setVideoInfo,
-  updateVideoPlayerSettings,
 } from 'redux/slices';
 
 const useVideoUpload = (onVideoFileSelected?: () => void) => {
@@ -36,15 +36,7 @@ const useVideoUpload = (onVideoFileSelected?: () => void) => {
     setVideoFile(null);
     dispatch(setVideoInfo(null));
     dispatch(setIsVideoUploadStarted(false));
-  };
-
-  const toggleVideoPlayerLayout = () => {
-    dispatch(
-      updateVideoPlayerSettings({
-        enableDefaultLayout:
-          !videoState.videoPlayerSettings.enableDefaultLayout,
-      }),
-    );
+    dispatch(resetTranscriptionState());
   };
 
   const updateVideoUploadState = (isUploadStarted: boolean) => {
@@ -56,7 +48,6 @@ const useVideoUpload = (onVideoFileSelected?: () => void) => {
     videoFile,
     handleVideoUpload,
     clearUploadedVideo,
-    toggleVideoPlayerLayout,
     updateVideoUploadState,
   };
 };

@@ -1,27 +1,42 @@
-import { Layout, VideoPlayer, VideoPlayerActionsMenu } from 'components';
+import {
+  Layout,
+  TranscriptionSegmentList,
+  VideoPlayer,
+  VideoPlayerActionsMenu,
+} from 'components';
+import { getVideoName } from 'utils';
 import { HStack, Text, VStack } from '@chakra-ui/react';
-import { useVideoUpload } from 'hooks';
+import { usePusher, useTranscription, useVideoUpload } from 'hooks';
 import UploadVideo from './UploadVideo';
 
 const AppContent = () => {
+  usePusher();
   const { video, isVideoUploadStarted } = useVideoUpload();
+  const { result, updateSegmentText } = useTranscription();
 
   return (
     <Layout>
-      <HStack w="100%" align="flex-start" justify="space-between">
+      <HStack w="100%" mt={4} align="flex-start" justify="space-between">
         {isVideoUploadStarted ? (
           <VStack w="50%">
             <VideoPlayer />
 
             <HStack w="100%" justify="space-between" align="center">
-              <Text fontWeight="bold">{video?.name.replace(`.mp4`, '')}</Text>
+              <Text fontWeight="bold">{getVideoName(video)}</Text>
               <VideoPlayerActionsMenu />
             </HStack>
           </VStack>
         ) : null}
 
         <VStack w={isVideoUploadStarted ? '45%' : '100%'} align="flex-start">
-          <UploadVideo />
+          {result ? (
+            <TranscriptionSegmentList
+              segments={result.segments}
+              updateSegmentText={updateSegmentText}
+            />
+          ) : (
+            <UploadVideo />
+          )}
         </VStack>
       </HStack>
     </Layout>

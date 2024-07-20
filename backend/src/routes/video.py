@@ -22,7 +22,7 @@ async def valid_content_length(
 
 
 @router.get("/video/upload-allowed")
-def upload_status(req: Request):
+def video_upload_allowed(req: Request):
     check_upload_allowed(req)
 
     return {"message": "Upload allowed"}
@@ -32,7 +32,7 @@ def upload_status(req: Request):
 def upload_video(req: Request, video: UploadFile = File(...)):
     check_upload_allowed(req)
 
-    user_id = uuid.uuid4()
+    user_id = str(uuid.uuid4())
 
     try:
         contents = video.file.read()
@@ -49,8 +49,20 @@ def upload_video(req: Request, video: UploadFile = File(...)):
     finally:
         video.file.close()
 
-    req.app.video_queue.append(
-        {"user_id": user_id, "filename": video.filename, "file_ext": "mp4"}
+    video_info = {
+        "user_id": user_id,
+        "filename": video.filename,
+        "file_ext": "mp4",
+    }
+    req.app.video_queue.append(video_info)
+    print(f"INFO: Added video to queue - {video_info}")
+    req.app.pusher_client.trigger(
+        channels=user_id,
+        event_name="transcribe-status",
+        data={
+            "message": "Waiting to convert video...",
+            "type": "info",
+        },
     )
 
     return {

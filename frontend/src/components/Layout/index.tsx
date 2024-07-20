@@ -11,7 +11,7 @@ const Layout = ({ children }: LayoutProps) => {
     <>
       <Header />
 
-      <Box as="main" h="calc(100vh - 100px)" p={8} overflow="auto">
+      <Box as="main" h="calc(100vh - 120px)" p={8} overflow="auto">
         {children}
       </Box>
 

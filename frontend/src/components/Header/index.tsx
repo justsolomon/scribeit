@@ -2,8 +2,15 @@ import { Heading, HStack } from '@chakra-ui/react';
 
 const Header = () => {
   return (
-    <HStack align="center" borderBottom="1px" h="50px" px={4}>
-      <Heading size="md">ScribeIt!</Heading>
+    <HStack
+      h="60px"
+      px={6}
+      align="center"
+      borderBottom="1px"
+      borderColor="gray.200"
+      boxShadow="md"
+    >
+      <Heading fontSize="24px">ScribeIt!</Heading>
     </HStack>
   );
 };

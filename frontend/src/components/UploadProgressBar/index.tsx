@@ -1,7 +1,6 @@
 import { Progress, Text, VStack } from '@chakra-ui/react';
-import { useAuth, usePusher } from 'hooks';
+import { useTranscription } from 'hooks';
 import { useEffect, useState } from 'react';
-import { UploadEventData } from 'types';
 
 interface UploadProgressBarProps {
   isVideoUploadingToServer: boolean;
@@ -12,42 +11,21 @@ const UploadProgressBar = ({
   isVideoUploadingToServer,
   uploadError,
 }: UploadProgressBarProps) => {
-  const pusher = usePusher();
-  const { user } = useAuth();
-  const [websocketData, setWebsocketData] = useState<UploadEventData | null>(
-    null,
-  );
   const [errorMessage, setErrorMessage] = useState('');
   const [progressLabel, setProgressLabel] = useState('');
+  const { status: transcriptionStatus } = useTranscription();
 
   useEffect(() => {
     if (isVideoUploadingToServer) {
       setProgressLabel('Uploading video...');
-    } else if (websocketData) {
-      if (websocketData.type === 'error') {
-        setErrorMessage(websocketData.message);
+    } else if (transcriptionStatus) {
+      if (transcriptionStatus.type === 'error') {
+        setErrorMessage(transcriptionStatus.message);
       } else {
-        setProgressLabel(websocketData.message);
+        setProgressLabel(transcriptionStatus.message);
       }
     }
-  }, [websocketData, isVideoUploadingToServer]);
-
-  const eventHandler = (data: UploadEventData) => {
-    setWebsocketData(data);
-  };
-
-  const isUserChannelSubscribed =
-    user?.id && pusher.isChannelSubscribed(user.id);
-
-  useEffect(() => {
-    if (isUserChannelSubscribed) {
-      pusher.bindChannelEvent(user.id, 'transcribe-status', eventHandler);
-    }
-
-    return () => {
-      pusher.unbindChannelEvent(user.id, 'transcribe-status', eventHandler);
-    };
-  }, [isUserChannelSubscribed]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [transcriptionStatus, isVideoUploadingToServer]);
 
   const hasError =
     Boolean(errorMessage || uploadError) && !isVideoUploadingToServer;
