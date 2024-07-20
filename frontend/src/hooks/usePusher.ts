@@ -1,21 +1,51 @@
 import { PusherContext } from 'containers';
 import { useContext, useEffect, useState } from 'react';
 import useAuth from './useAuth';
+import {
+  TranscriptionResultEventData,
+  TranscriptionStatusEventData,
+} from 'types';
+import { useAppDispatch } from 'redux/hooks';
+import {
+  setTranscriptionServerResult,
+  setTranscriptionStatus,
+} from 'redux/slices';
 
 const usePusher = () => {
   const pusherInstance = useContext(PusherContext);
   const [subscribedChannels, setSubscribedChannels] = useState(new Set());
   const { user } = useAuth();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const userId = user?.id;
 
-    if (pusherInstance && userId) {
+    if (pusherInstance && userId && !isChannelSubscribed(userId)) {
       subscribe(userId);
+      bindChannelEvent(
+        userId,
+        'transcribe-status',
+        transcriptionStatusEventHandler,
+      );
+      bindChannelEvent(
+        userId,
+        'transcription-result',
+        transcriptionResultEventHandler,
+      );
     }
 
     return () => {
       unsubscribe(userId);
+      unbindChannelEvent(
+        userId,
+        'transcribe-status',
+        transcriptionStatusEventHandler,
+      );
+      unbindChannelEvent(
+        userId,
+        'transcription-result',
+        transcriptionResultEventHandler,
+      );
     };
   }, [pusherInstance, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -70,6 +100,18 @@ const usePusher = () => {
 
   const isChannelSubscribed = (channelName: string) => {
     return subscribedChannels.has(channelName);
+  };
+
+  const transcriptionStatusEventHandler = (
+    data: TranscriptionStatusEventData,
+  ) => {
+    dispatch(setTranscriptionStatus(data));
+  };
+
+  const transcriptionResultEventHandler = (
+    data: TranscriptionResultEventData,
+  ) => {
+    dispatch(setTranscriptionServerResult(data));
   };
 
   return {

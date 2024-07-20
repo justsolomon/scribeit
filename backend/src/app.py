@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import video
@@ -8,6 +8,7 @@ from redis import Redis
 from collections import deque
 from .utils.queue import video_to_audio, transcribe_audio, remove_unused_files
 from pusher import Pusher
+import whisper
 
 
 @asynccontextmanager
@@ -22,16 +23,21 @@ async def lifespan(app: FastAPI):
     app.video_queue = deque()
     app.audio_queue = deque()
 
+    # initialize whisper model
+    app.whisper_model = whisper.load_model("base.en")
+
     # start processing tasks
     asyncio.create_task(
         video_to_audio(app.video_queue, app.audio_queue, app.pusher_client)
     )
-    asyncio.create_task(transcribe_audio(app.audio_queue, app.pusher_client))
+    asyncio.create_task(
+        transcribe_audio(app.audio_queue, app.whisper_model, app.pusher_client)
+    )
     asyncio.create_task(remove_unused_files(app.video_queue, app.audio_queue))
 
     yield
 
-    print("Shutting down...")
+    print("INFO: Shutting down...")
 
 
 app = FastAPI(
@@ -49,9 +55,3 @@ app.add_middleware(
 )
 
 app.include_router(video.router)
-
-
-@app.get("/")
-def read_root(req: Request):
-    req.app.queue.append("Hello World")
-    return {"Hello": "World"}

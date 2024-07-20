@@ -5,15 +5,22 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
-import { useVideoUpload } from 'hooks';
-import { LayoutLeft, LayoutRight, MoreHoriz, Upload } from 'iconoir-react';
+import { useTranscription, useVideoPlayer, useVideoUpload } from 'hooks';
+import {
+  Download,
+  LayoutLeft,
+  LayoutRight,
+  MoreHoriz,
+  Upload,
+} from 'iconoir-react';
 
 const VideoPlayerActionsMenu = () => {
+  const { clearUploadedVideo } = useVideoUpload();
   const {
     videoPlayerSettings: { enableDefaultLayout },
     toggleVideoPlayerLayout,
-    clearUploadedVideo,
-  } = useVideoUpload();
+  } = useVideoPlayer();
+  const { isTranscriptionComplete, downloadSRTFile } = useTranscription();
 
   return (
     <Menu placement="left-start">
@@ -26,14 +33,25 @@ const VideoPlayerActionsMenu = () => {
       />
 
       <MenuList>
-        <MenuItem icon={<Upload />} onClick={clearUploadedVideo}>
-          Upload new video
-        </MenuItem>
         <MenuItem
           icon={enableDefaultLayout ? <LayoutRight /> : <LayoutLeft />}
           onClick={toggleVideoPlayerLayout}
         >
           {enableDefaultLayout ? 'Use Plyr layout' : 'Use default layout'}
+        </MenuItem>
+        <MenuItem
+          icon={<Upload />}
+          onClick={clearUploadedVideo}
+          isDisabled={!isTranscriptionComplete}
+        >
+          Upload new video
+        </MenuItem>
+        <MenuItem
+          icon={<Download />}
+          onClick={downloadSRTFile}
+          isDisabled={!isTranscriptionComplete}
+        >
+          Download subtitles (SRT)
         </MenuItem>
       </MenuList>
     </Menu>

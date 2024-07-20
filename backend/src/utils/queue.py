@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 from collections import deque
 from pusher.pusher_client import PusherClient
+from whisper import Whisper
 from ..config.settings import settings
 from .file import get_video_file_path, get_audio_file_path, get_storage_filename
 
@@ -37,10 +38,10 @@ def convert_video(
 
     try:
         subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-        print(f"Successfully converted {video_file_path} to {audio_file_path}")
+        print(f"INFO: Successfully converted {video_file_path} to {audio_file_path}")
     except subprocess.CalledProcessError as e:
         print(
-            f"An error occurred while converting {video_file_path} to {audio_file_path}"
+            f"ERROR: An error occurred while converting {video_file_path} to {audio_file_path}"
         )
         pusher_client.trigger(
             channels=user_id,
@@ -56,13 +57,13 @@ def convert_video(
 async def video_to_audio(
     video_queue: deque, audio_queue: deque, pusher_client: PusherClient
 ) -> None:
-    print("Waiting for uploaded videos...")
+    print("INFO: Waiting for uploaded videos...")
 
     while True:
         while video_queue:
             video = video_queue[0]
-            user_id = str(video["user_id"])
-            print(f"Converting video: {video}")
+            user_id = video["user_id"]
+            print(f"INFO: Converting video - {video}")
             pusher_client.trigger(
                 channels=user_id,
                 event_name="transcribe-status",
@@ -74,11 +75,10 @@ async def video_to_audio(
                 get_audio_file_path(user_id, video["filename"]),
             )
 
-            video_file = Path(video_file_path)
             try:
-                video_file.resolve(strict=True)
+                video_file_path.resolve(strict=True)
             except FileNotFoundError:
-                print(f"File not found: {video_file_path}")
+                print(f"ERROR: File not found - {video_file_path}")
                 pusher_client.trigger(
                     channels=user_id,
                     event_name="transcribe-status",
@@ -92,14 +92,18 @@ async def video_to_audio(
                 create_parent_directory(audio_file_path)
                 convert_video(video_file_path, audio_file_path, user_id, pusher_client)
 
+                print(
+                    f"INFO: Successfully converted {video_file_path} to {audio_file_path}"
+                )
                 pusher_client.trigger(
                     channels=user_id,
                     event_name="transcribe-status",
                     data={
-                        "message": "Successfully converted video to audio.",
+                        "message": "Waiting to transcribe video...",
                         "type": "info",
                     },
                 )
+
                 audio_queue.append({**video, "file_ext": "mp3"})
 
             video_queue.popleft()
@@ -107,27 +111,54 @@ async def video_to_audio(
         await asyncio.sleep(settings.ASYNCIO_DELAY)
 
 
-async def transcribe_audio(audio_queue: deque, pusher_client: PusherClient) -> None:
-    print("Waiting for converted audio...")
+async def transcribe_audio(
+    audio_queue: deque,
+    whisper_model: Whisper,
+    pusher_client: PusherClient,
+) -> None:
+    print("INFO: Waiting for converted audio...")
 
     while True:
         while audio_queue:
             audio = audio_queue[0]
-            user_id = str(audio["user_id"])
-            print(f"Transcribing audio: {audio}")
+            user_id = audio["user_id"]
+
+            print(f"INFO: Transcribing audio - {audio}")
             pusher_client.trigger(
                 channels=user_id,
                 event_name="transcribe-status",
-                data={"message": "Transcribing audio...", "type": "info"},
+                data={"message": "Transcribing video...", "type": "info"},
             )
 
-            audio_queue.popleft()
+            try:
+                result = whisper_model.transcribe(
+                    get_audio_file_path(user_id, audio["filename"]).as_posix()
+                )
+                pusher_client.trigger(
+                    channels=user_id,
+                    event_name="transcription-result",
+                    data=result,
+                )
+            except Exception as err:
+                print(f"ERROR: An error occurred while transcribing {audio}")
+                print(f"Error message: {err}")
+
+                pusher_client.trigger(
+                    channels=user_id,
+                    event_name="transcribe-status",
+                    data={
+                        "message": "Transcription failed. Please try again.",
+                        "type": "error",
+                    },
+                )
+            finally:
+                audio_queue.popleft()
 
         await asyncio.sleep(settings.ASYNCIO_DELAY)
 
 
 async def remove_unused_files(video_queue: deque, audio_queue: deque) -> None:
-    print("Waiting for unused files...")
+    print("INFO: Waiting for unused files...")
 
     while True:
         for subdir, _, files in os.walk("files"):
@@ -141,6 +172,6 @@ async def remove_unused_files(video_queue: deque, audio_queue: deque) -> None:
                 ):
                     file_obj = Path(file_path)
                     file_obj.unlink(missing_ok=True)
-                    print(f"Deleted unused file: {file_path}")
+                    print(f"INFO: Deleted unused file - {file_path}")
 
         await asyncio.sleep(settings.ASYNCIO_DELAY)

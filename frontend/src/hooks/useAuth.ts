@@ -8,7 +8,7 @@ const useAuth = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
+    const user = sessionStorage.getItem('user');
 
     if (user) {
       dispatch(setActiveUser(JSON.parse(user)));
@@ -17,7 +17,7 @@ const useAuth = () => {
 
   const updateUser = (newUser: Partial<User>) => {
     dispatch(setActiveUser({ ...user, ...newUser }));
-    localStorage.setItem('user', JSON.stringify(user));
+    sessionStorage.setItem('user', JSON.stringify(user));
   };
 
   return { user, updateUser };

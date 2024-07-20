@@ -29,13 +29,15 @@ const VideoUploadArea = ({
       disabled={isDisabled}
     >
       <VStack
-        p={4}
+        p={8}
         border="1px"
+        borderColor="gray.100"
         borderRadius="8px"
         spacing={4}
         justify="center"
         fontSize="15px"
         opacity={isDisabled ? '0.5' : '1'}
+        boxShadow="xl"
       >
         <Heading as="h2" fontSize="20px">
           Select video file

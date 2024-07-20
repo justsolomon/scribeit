@@ -1,11 +1,5 @@
 import { APIDefaultResponse } from './global.type';
 
-export interface UploadEventData {
-  message: string;
-  progress: number;
-  type: 'info' | 'error';
-}
-
 export interface UploadVideoResponse extends APIDefaultResponse {
   message: string;
   userId: string;
