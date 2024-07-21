@@ -32,9 +32,7 @@ def convert_video(
     video_file_path: str,
     audio_file_path: str,
 ) -> None:
-    command = (
-        f"ffmpeg -i {video_file_path} -vn -map_metadata -1 -ac 1 -c:a libopus -b:a 12k -application voip {audio_file_path}"
-    )
+    command = f"ffmpeg -i {video_file_path} -vn -map_metadata -1 -ac 1 -c:a libopus -b:a 12k -application voip {audio_file_path}"
 
     subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
     print(f"INFO: Successfully converted {video_file_path} to {audio_file_path}")
@@ -136,7 +134,7 @@ async def transcribe_audio(
                 result = whisper_model.transcribe(
                     get_audio_file_path(user_id, audio["filename"]).as_posix()
                 )
-                
+
                 cache.set(user_id, json.dumps(result))
                 pusher_client.trigger(
                     channels=user_id,
