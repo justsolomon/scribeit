@@ -13,10 +13,10 @@ export interface TranscriptionSegment {
 
 export interface TranscriptionStatusEventData {
   message: string;
-  type: 'info' | 'error';
+  type: 'info' | 'error' | 'success';
 }
 
-export interface TranscriptionResultEventData {
+export interface TranscriptionData {
   text: string;
   segments: TranscriptionSegment[];
   language: string;
@@ -32,8 +32,8 @@ export interface TranscriptionAction {
 
 export interface TranscriptionState {
   status: TranscriptionStatusEventData | null;
-  result: TranscriptionResultEventData | null;
-  serverResult: TranscriptionResultEventData | null;
+  result: TranscriptionData | null;
+  serverResult: TranscriptionData | null;
   srtFilePath: string | null;
   actionHistory: { stack: TranscriptionAction[]; checkpointIndex: number };
 }

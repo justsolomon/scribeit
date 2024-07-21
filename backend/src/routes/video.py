@@ -1,8 +1,9 @@
+import uuid
+import json
 from fastapi import APIRouter, File, Header, Depends, UploadFile, Request, HTTPException
 from ..config.settings import settings
 from ..utils.file import get_video_file_path
 from pathlib import Path
-import uuid
 
 router = APIRouter()
 
@@ -55,6 +56,7 @@ def upload_video(req: Request, video: UploadFile = File(...)):
         "file_ext": "mp4",
     }
     req.app.video_queue.append(video_info)
+
     print(f"INFO: Added video to queue - {video_info}")
     req.app.pusher_client.trigger(
         channels=user_id,
@@ -69,3 +71,13 @@ def upload_video(req: Request, video: UploadFile = File(...)):
         "userId": f"{user_id}",
         "message": f"Successfully uploaded {video.filename}",
     }
+
+
+@router.get("/video/transcription")
+def get_video_transcription(req: Request, userId: str):
+    result = req.app.cache.get(userId)
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Transcription not found")
+
+    return json.loads(result)

@@ -1,5 +1,6 @@
 import { HStack, Text, VStack } from '@chakra-ui/react';
 import { useVideoPlayer } from 'hooks';
+import { useEffect, useRef } from 'react';
 import { TranscriptionSegment } from 'types';
 import { convertSecondToDisplayedTime } from 'utils';
 
@@ -13,6 +14,18 @@ const TranscriptionSegmentList = ({
   updateSegmentText,
 }: TranscriptionSegmentListProps) => {
   const { currentTime, seekToTime } = useVideoPlayer();
+  const listContainer = useRef<HTMLDivElement>(null);
+
+  const scrollToSegment = (index: number) => {
+    if (!listContainer.current) {
+      return;
+    }
+
+    listContainer.current.scrollTo({
+      behavior: 'smooth',
+      top: index * 100,
+    });
+  };
 
   return (
     <VStack
@@ -24,11 +37,13 @@ const TranscriptionSegmentList = ({
       borderTop="1px"
       borderBottom="1px"
       borderColor="gray.200"
+      ref={listContainer}
     >
       {segments.map((segment, index) => (
         <TranscriptionSegmentItem
           currentTime={currentTime}
           seekToTime={seekToTime}
+          scrollToSegment={() => scrollToSegment(index)}
           updateSegmentText={(text) => updateSegmentText(segment.id, text)}
           {...segment}
           key={index}
@@ -42,6 +57,7 @@ export default TranscriptionSegmentList;
 
 interface TranscriptionSegmentItemProps extends TranscriptionSegment {
   currentTime: number;
+  scrollToSegment: () => void;
   updateSegmentText: (text: string) => void;
   seekToTime: (time: number) => void;
 }
@@ -51,10 +67,16 @@ const TranscriptionSegmentItem = ({
   end,
   text,
   currentTime,
-  // updateSegmentText,
+  scrollToSegment,
   seekToTime,
 }: TranscriptionSegmentItemProps) => {
   const isActive = currentTime >= start && currentTime <= end;
+
+  useEffect(() => {
+    if (isActive) {
+      scrollToSegment();
+    }
+  }, [isActive]);
 
   return (
     <HStack
@@ -70,6 +92,8 @@ const TranscriptionSegmentItem = ({
       borderBottom="1px"
       borderColor="gray.100"
       borderLeftColor={isActive ? 'blue.500' : 'transparent'}
+      bg={isActive ? 'gray.100' : 'transparent'}
+      _hover={{ bg: 'gray.50' }}
       transition="all 0.2s"
       cursor="pointer"
     >
