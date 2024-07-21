@@ -4,7 +4,14 @@ ScribeIt! is a web application that allows you to transcribe videos and download
 
 ## How It Works
 
-When a video is uploaded by the user, it gets sent to the server for processing. On the server, the video is first converted to audio format using `ffmpeg`, before being passed to the Whisper model to transcribe. The transcription result is then stored in a `Redis` cache, before being fetched by the client to display. For real-time updates on the status of the transcription, the server communicates with the client using [Pusher](https://pusher.com/) events.
+After a video is uploaded on the client:
+
+1. The video gets sent to the server for processing.
+2. On the server, the video is first converted to audio format using `ffmpeg`.
+3. After the conversion, the audio is passed to the Whisper model to transcribe.
+4. The transcription result is stored in the `Redis` cache, before being fetched by the client to display.
+
+For real-time updates on the status of the transcription, the server communicates with the client using [Pusher](https://pusher.com/) events.
 
 ## Demo
 
@@ -26,8 +33,8 @@ The following packages must be installed on your PC:
 
 You also need secrets from the following providers to continue. To see the exact secrets you need, check the `.env.sample` files in the `backend` and `frontend` folders:
 
-- Redis: You can run the server by [installing Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/) locally, or using [Redis Cloud](https://redis.io/docs/latest/operate/rc/).
-- Pusher: Get started by creating an account on [Pusher.com](https://dashboard.pusher.com/accounts/sign_up) and creating a [Channels](https://pusher.com/channels/) app.
+- **Redis**: You can run the server by [installing Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/) locally, or using [Redis Cloud](https://redis.io/docs/latest/operate/rc/).
+- **Pusher**: Get started by creating an account on [Pusher.com](https://dashboard.pusher.com/accounts/sign_up) and creating a [Channels](https://pusher.com/channels/) app.
 
 ### Running locally
 
@@ -73,4 +80,4 @@ To run the app locally, follow the steps below:
    source backend/.venv/bin/activate && ./bin/start
    ```
 
-**PS:** To run the app, you can simply use the `./bin/start` command if the virtual environment is already activated.
+**PS:** If the virtual environment is already activated, you can simply use the `./bin/start` command to run the app.
