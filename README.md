@@ -1,18 +1,33 @@
 # ScribeIt!
 
-Repo for ScribeIt! app
+ScribeIt! is a web application that allows you to transcribe videos and download the subtitles for free. Powered by OpenAI's [Whisper](https://github.com/openai/whisper).
+
+## How It Works
+
+When a video is uploaded by the user, it gets sent to the server for processing. On the server, the video is first converted to audio format using `ffmpeg`, before being passed to the Whisper model to transcribe. The transcription result is then stored in a `Redis` cache, before being fetched by the client to display. For real-time updates on the status of the transcription, the server communicates with the client using [Pusher](https://pusher.com/) events.
+
+## Demo
+
+https://github.com/user-attachments/assets/964e352a-3cf2-443c-8943-1f7c2ef87cc4
 
 ## Getting Started
 
-The following contains the steps required to get the application up and running on your local workspace. You need to have the packages listed in the `Prerequisites` section installed on your PC to be able to continue.
+The following contains the steps required to get the application up and running on your local workspace.
 
 ### Prerequisites
+
+The following packages must be installed on your PC:
 
 - Node v22.2.0
 - yarn v1.22.19
 - Git v2.39.3
 - Python v3.9.14
 - ffmpeg v7.0.1
+
+You also need secrets from the following providers to continue. To see the exact secrets you need, check the `.env.sample` files in the `backend` and `frontend` folders:
+
+- Redis: You can run the server by [installing Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/) locally, or using [Redis Cloud](https://redis.io/docs/latest/operate/rc/).
+- Pusher: Get started by creating an account on [Pusher.com](https://dashboard.pusher.com/accounts/sign_up) and creating a [Channels](https://pusher.com/channels/) app.
 
 ### Running locally
 
