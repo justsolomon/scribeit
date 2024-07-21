@@ -10,7 +10,7 @@ import {
   videoApi,
 } from 'redux/services';
 import { APIErrorResponse } from 'types';
-import { getAPIErrorType } from 'utils';
+import { getAPIErrorType, VIDEO_UPLOAD_SIZE_LIMIT } from 'utils';
 import { toastErrorMessage } from 'utils/toast';
 
 const UploadVideo = () => {
@@ -74,7 +74,7 @@ const UploadVideo = () => {
           errorMessage = 'Please upload a valid video file';
           break;
         case 'less_than':
-          errorMessage = 'File size should be less than 10MB';
+          errorMessage = `File size should be less than ${VIDEO_UPLOAD_SIZE_LIMIT}MB`;
           break;
       }
 

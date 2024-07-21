@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
         video_to_audio(app.video_queue, app.audio_queue, app.pusher_client)
     )
     asyncio.create_task(
-        transcribe_audio(app.audio_queue, app.whisper_model, app.pusher_client)
+        transcribe_audio(app.audio_queue, app.whisper_model, app.cache, app.pusher_client)
     )
     asyncio.create_task(remove_unused_files(app.video_queue, app.audio_queue))
 

@@ -1,15 +1,9 @@
-import { PusherContext } from 'containers';
-import { useContext, useEffect, useState } from 'react';
 import useAuth from './useAuth';
-import {
-  TranscriptionResultEventData,
-  TranscriptionStatusEventData,
-} from 'types';
+import { PusherContext } from 'containers';
 import { useAppDispatch } from 'redux/hooks';
-import {
-  setTranscriptionServerResult,
-  setTranscriptionStatus,
-} from 'redux/slices';
+import { TranscriptionStatusEventData } from 'types';
+import { setTranscriptionStatus } from 'redux/slices';
+import { useContext, useEffect, useState } from 'react';
 
 const usePusher = () => {
   const pusherInstance = useContext(PusherContext);
@@ -27,11 +21,6 @@ const usePusher = () => {
         'transcribe-status',
         transcriptionStatusEventHandler,
       );
-      bindChannelEvent(
-        userId,
-        'transcription-result',
-        transcriptionResultEventHandler,
-      );
     }
 
     return () => {
@@ -40,11 +29,6 @@ const usePusher = () => {
         userId,
         'transcribe-status',
         transcriptionStatusEventHandler,
-      );
-      unbindChannelEvent(
-        userId,
-        'transcription-result',
-        transcriptionResultEventHandler,
       );
     };
   }, [pusherInstance, user]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -106,12 +90,6 @@ const usePusher = () => {
     data: TranscriptionStatusEventData,
   ) => {
     dispatch(setTranscriptionStatus(data));
-  };
-
-  const transcriptionResultEventHandler = (
-    data: TranscriptionResultEventData,
-  ) => {
-    dispatch(setTranscriptionServerResult(data));
   };
 
   return {

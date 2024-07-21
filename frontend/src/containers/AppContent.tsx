@@ -22,13 +22,15 @@ const AppContent = () => {
             <VideoPlayer />
 
             <HStack w="100%" justify="space-between" align="center">
-              <Text fontWeight="bold">{getVideoName(video)}</Text>
+              <Text fontWeight="bold" fontSize="18px">
+                {getVideoName(video)}
+              </Text>
               <VideoPlayerActionsMenu />
             </HStack>
           </VStack>
         ) : null}
 
-        <VStack w={isVideoUploadStarted ? '45%' : '100%'} align="flex-start">
+        <VStack w={isVideoUploadStarted ? '40%' : '100%'} align="flex-start">
           {result ? (
             <TranscriptionSegmentList
               segments={result.segments}

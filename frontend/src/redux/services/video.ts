@@ -1,5 +1,9 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { APIDefaultResponse, UploadVideoResponse } from 'types';
+import {
+  APIDefaultResponse,
+  TranscriptionData,
+  UploadVideoResponse,
+} from 'types';
 import { getBaseQuery } from 'utils';
 
 const videoApi = createApi({
@@ -16,10 +20,21 @@ const videoApi = createApi({
         method: 'POST',
       }),
     }),
+    getTranscription: builder.query<TranscriptionData, string>({
+      query: (userId) => ({
+        url: '/transcription',
+        params: {
+          userId,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useLazyVideoUploadAllowedQuery, useUploadVideoMutation } =
-  videoApi;
+export const {
+  useLazyVideoUploadAllowedQuery,
+  useUploadVideoMutation,
+  useLazyGetTranscriptionQuery,
+} = videoApi;
 
 export default videoApi;

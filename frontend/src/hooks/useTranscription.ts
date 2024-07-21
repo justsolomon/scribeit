@@ -4,8 +4,13 @@ import {
   setActionHistoryCheckpoint,
   setActionHistoryData,
   setSRTFilePath,
+  setTranscriptionServerResult,
 } from 'redux/slices';
-import { TranscriptionAction, TranscriptionSegment } from 'types';
+import {
+  TranscriptionAction,
+  TranscriptionData,
+  TranscriptionSegment,
+} from 'types';
 import { convertSecondToTimecode, getVideoName } from 'utils';
 
 const useTranscription = () => {
@@ -160,6 +165,10 @@ const useTranscription = () => {
     addAction({ type: 'editText', payload: { segmentId, text: newText } });
   };
 
+  const updateTranscriptionServerResult = (data: TranscriptionData) => {
+    dispatch(setTranscriptionServerResult(data));
+  };
+
   return {
     ...transcriptionState,
     isTranscriptionComplete: Boolean(transcriptionState.result),
@@ -168,6 +177,7 @@ const useTranscription = () => {
     updateSegmentText,
     undoAction,
     redoAction,
+    updateTranscriptionServerResult,
   };
 };
 

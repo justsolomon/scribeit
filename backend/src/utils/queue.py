@@ -1,10 +1,12 @@
 import os
 import asyncio
 import subprocess
+import json
 from pathlib import Path
 from collections import deque
 from pusher.pusher_client import PusherClient
 from whisper import Whisper
+from redis import Redis
 from ..config.settings import settings
 from .file import get_video_file_path, get_audio_file_path, get_storage_filename
 
@@ -18,7 +20,7 @@ def is_video(file_path: str) -> bool:
 
 
 def is_audio(file_path: str) -> bool:
-    return file_path.endswith(".mp3")
+    return file_path.endswith(".ogg")
 
 
 def create_parent_directory(file_path: str) -> None:
@@ -29,29 +31,13 @@ def create_parent_directory(file_path: str) -> None:
 def convert_video(
     video_file_path: str,
     audio_file_path: str,
-    user_id: str,
-    pusher_client: PusherClient,
 ) -> None:
     command = (
-        f"ffmpeg -i {video_file_path} -vn -ar 44100 -ac 2 -b:a 192k {audio_file_path}"
+        f"ffmpeg -i {video_file_path} -vn -map_metadata -1 -ac 1 -c:a libopus -b:a 12k -application voip {audio_file_path}"
     )
 
-    try:
-        subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-        print(f"INFO: Successfully converted {video_file_path} to {audio_file_path}")
-    except subprocess.CalledProcessError as e:
-        print(
-            f"ERROR: An error occurred while converting {video_file_path} to {audio_file_path}"
-        )
-        pusher_client.trigger(
-            channels=user_id,
-            event_name="transcribe-status",
-            data={
-                "message": "Video conversion failed. Please try again.",
-                "type": "error",
-            },
-        )
-        print(f"Error message: {e.output.decode()}")
+    subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+    print(f"INFO: Successfully converted {video_file_path} to {audio_file_path}")
 
 
 async def video_to_audio(
@@ -90,21 +76,36 @@ async def video_to_audio(
                 pass
             else:
                 create_parent_directory(audio_file_path)
-                convert_video(video_file_path, audio_file_path, user_id, pusher_client)
 
-                print(
-                    f"INFO: Successfully converted {video_file_path} to {audio_file_path}"
-                )
-                pusher_client.trigger(
-                    channels=user_id,
-                    event_name="transcribe-status",
-                    data={
-                        "message": "Waiting to transcribe video...",
-                        "type": "info",
-                    },
-                )
+                try:
+                    convert_video(video_file_path, audio_file_path)
 
-                audio_queue.append({**video, "file_ext": "mp3"})
+                    print(
+                        f"INFO: Successfully converted {video_file_path} to {audio_file_path}"
+                    )
+                    pusher_client.trigger(
+                        channels=user_id,
+                        event_name="transcribe-status",
+                        data={
+                            "message": "Waiting to transcribe video...",
+                            "type": "info",
+                        },
+                    )
+
+                    audio_queue.append({**video, "file_ext": "ogg"})
+                except subprocess.CalledProcessError as e:
+                    print(
+                        f"ERROR: An error occurred while converting {video_file_path} to {audio_file_path}"
+                    )
+                    pusher_client.trigger(
+                        channels=user_id,
+                        event_name="transcribe-status",
+                        data={
+                            "message": "Video conversion failed. Please try again.",
+                            "type": "error",
+                        },
+                    )
+                    print(f"Error message: {e.output.decode()}")
 
             video_queue.popleft()
 
@@ -114,6 +115,7 @@ async def video_to_audio(
 async def transcribe_audio(
     audio_queue: deque,
     whisper_model: Whisper,
+    cache: Redis,
     pusher_client: PusherClient,
 ) -> None:
     print("INFO: Waiting for converted audio...")
@@ -134,10 +136,12 @@ async def transcribe_audio(
                 result = whisper_model.transcribe(
                     get_audio_file_path(user_id, audio["filename"]).as_posix()
                 )
+                
+                cache.set(user_id, json.dumps(result))
                 pusher_client.trigger(
                     channels=user_id,
-                    event_name="transcription-result",
-                    data=result,
+                    event_name="transcribe-status",
+                    data={"message": "Transcription complete", "type": "success"},
                 )
             except Exception as err:
                 print(f"ERROR: An error occurred while transcribing {audio}")
