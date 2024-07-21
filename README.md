@@ -11,7 +11,8 @@ The following contains the steps required to get the application up and running 
 - Node v22.2.0
 - yarn v1.22.19
 - Git v2.39.3
-- Python 3.9.14
+- Python v3.9.14
+- ffmpeg v7.0.1
 
 ### Running locally
 
