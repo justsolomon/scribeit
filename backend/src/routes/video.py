@@ -10,6 +10,7 @@ router = APIRouter()
 
 def check_upload_allowed(req: Request):
     if len(req.app.video_queue) == settings.MAX_QUEUE_LENGTH:
+        print("ERROR: Video upload limit reached")
         raise HTTPException(
             status_code=429,
             detail="Video upload limit reached. Please try again later.",
@@ -42,7 +43,9 @@ def upload_video(req: Request, video: UploadFile = File(...)):
 
         with open(output_file, "wb") as f:
             f.write(contents)
-    except Exception:
+    except Exception as err:
+        print("ERROR: Error uploading file")
+        print(err)
         raise HTTPException(
             status_code=500,
             detail="There was an error uploading the file. Please try again.",
@@ -78,6 +81,7 @@ def get_video_transcription(req: Request, userId: str):
     result = req.app.cache.get(userId)
 
     if not result:
+        print(f"ERROR: Transcription not found for {userId}")
         raise HTTPException(status_code=404, detail="Transcription not found")
 
     return json.loads(result)

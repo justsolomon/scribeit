@@ -165,7 +165,7 @@ const useTranscription = () => {
     addAction({ type: 'editText', payload: { segmentId, text: newText } });
   };
 
-  const updateTranscriptionServerResult = (data: TranscriptionData) => {
+  const updateTranscriptionServerResult = (data: TranscriptionData[]) => {
     dispatch(setTranscriptionServerResult(data));
   };
 

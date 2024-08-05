@@ -27,6 +27,7 @@ export const getAPIErrorMessage = (
   return (
     (error?.data?.detail as APIDefaultErrorDetail[])?.[0]?.msg ||
     (error?.data?.detail as string) ||
+    (error as any)?.error ||
     defaultMessage
   );
 };
