@@ -10,7 +10,7 @@ router = APIRouter()
 
 def check_upload_allowed(req: Request):
     if len(req.app.video_queue) == settings.MAX_QUEUE_LENGTH:
-        print(f"ERROR: Video upload limit reached")
+        print("ERROR: Video upload limit reached")
         raise HTTPException(
             status_code=429,
             detail="Video upload limit reached. Please try again later.",
@@ -44,7 +44,7 @@ def upload_video(req: Request, video: UploadFile = File(...)):
         with open(output_file, "wb") as f:
             f.write(contents)
     except Exception as err:
-        print(f"ERROR: Error uploading file")
+        print("ERROR: Error uploading file")
         print(err)
         raise HTTPException(
             status_code=500,

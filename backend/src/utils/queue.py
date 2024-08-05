@@ -13,7 +13,10 @@ from .file import get_video_file_path, get_audio_file_path, get_storage_filename
 
 
 def is_file_in_queue(filename: str, queue: deque) -> bool:
-    return any(filename == get_storage_filename(item['filename'], item['file_ext']) for item in queue)
+    return any(
+        filename == get_storage_filename(item["filename"], item["file_ext"])
+        for item in queue
+    )
 
 
 def is_video(file_path: str) -> bool:
@@ -38,8 +41,9 @@ def convert_video(
 
     subprocess.check_output(convert_video_command, stderr=subprocess.STDOUT, shell=True)
     print(f"INFO: Successfully converted {video_file_path} to {audio_file_path}")
-    
+
     subprocess.check_output(split_audio_command, stderr=subprocess.STDOUT, shell=True)
+
 
 async def video_to_audio(
     video_queue: deque, audio_queue: deque, pusher_client: PusherClient
@@ -80,9 +84,11 @@ async def video_to_audio(
 
                 try:
                     convert_video(video_file_path, audio_file_path)
-                    
+
                     split_audio_files = glob.glob(f"{audio_file_path}_*.ogg")
-                    print(f"INFO: Successfully split audio files with base {audio_file_path} into: {split_audio_files}")
+                    print(
+                        f"INFO: Successfully split audio files with base {audio_file_path} into: {split_audio_files}"
+                    )
 
                     pusher_client.trigger(
                         channels=user_id,
@@ -92,9 +98,11 @@ async def video_to_audio(
                             "type": "info",
                         },
                     )
-                                        
+
                     for audio_file in split_audio_files:
-                        audio_queue.append({**video, "file_path": audio_file, "file_ext": "ogg"})
+                        audio_queue.append(
+                            {**video, "file_path": audio_file, "file_ext": "ogg"}
+                        )
                 except subprocess.CalledProcessError as e:
                     print(
                         f"ERROR: An error occurred while converting {video_file_path} to {audio_file_path}"
@@ -135,9 +143,7 @@ async def transcribe_audio(
             )
 
             try:
-                result = whisper_model.transcribe(
-                    audio["file_path"]
-                )
+                result = whisper_model.transcribe(audio["file_path"])
 
                 transcription = cache.get(user_id)
                 if transcription:
@@ -145,7 +151,7 @@ async def transcribe_audio(
                     transcription.append(result)
                 else:
                     transcription = [result]
-                    
+
                 cache.set(user_id, json.dumps(transcription))
                 pusher_client.trigger(
                     channels=user_id,
