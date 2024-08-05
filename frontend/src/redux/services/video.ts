@@ -20,7 +20,7 @@ const videoApi = createApi({
         method: 'POST',
       }),
     }),
-    getTranscription: builder.query<TranscriptionData, string>({
+    getTranscription: builder.query<TranscriptionData[], string>({
       query: (userId) => ({
         url: '/transcription',
         params: {

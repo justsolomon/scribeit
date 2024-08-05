@@ -10,6 +10,7 @@ const errorHandler: Middleware = (api: MiddlewareAPI) => (next) => (action) => {
     let errorType = '';
 
     if (action.payload) {
+      console.log(action.payload);
       errorMessage = getAPIErrorMessage(
         action.payload as APIErrorResponse,
         errorMessage,

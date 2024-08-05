@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TranscriptionAction, TranscriptionState } from 'types';
+import { compileSegments } from 'utils';
 
 const initialState: TranscriptionState = {
   status: null,
@@ -24,7 +25,12 @@ export const transcriptionSlice = createSlice({
       action: PayloadAction<TranscriptionState['serverResult']>,
     ) => {
       state.serverResult = action.payload;
-      state.result = action.payload;
+      state.result = {
+        text:
+          action.payload?.reduce((prev, curr) => prev + ' ' + curr, '') || '',
+        segments: compileSegments(action.payload || []),
+        language: 'en',
+      };
     },
     setTranscriptionResult: (
       state,

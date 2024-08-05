@@ -33,7 +33,7 @@ export interface TranscriptionAction {
 export interface TranscriptionState {
   status: TranscriptionStatusEventData | null;
   result: TranscriptionData | null;
-  serverResult: TranscriptionData | null;
+  serverResult: TranscriptionData[] | null;
   srtFilePath: string | null;
   actionHistory: { stack: TranscriptionAction[]; checkpointIndex: number };
 }
