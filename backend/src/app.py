@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import video
-from .config import database, pusher
+from .config import database, pusher, settings
 import asyncio
 from redis import Redis
 from collections import deque
-from .utils.queue import video_to_audio, transcribe_audio, remove_unused_files
+from .services import transcription as transcription_service, file as file_service
 from pusher import Pusher
 import whisper
 
@@ -28,14 +28,18 @@ async def lifespan(app: FastAPI):
 
     # start processing tasks
     asyncio.create_task(
-        video_to_audio(app.video_queue, app.audio_queue, app.pusher_client)
+        transcription_service.convert_video_to_audio(
+            app.video_queue, app.audio_queue, app.pusher_client
+        )
     )
     asyncio.create_task(
-        transcribe_audio(
+        transcription_service.transcribe_audio(
             app.audio_queue, app.whisper_model, app.cache, app.pusher_client
         )
     )
-    asyncio.create_task(remove_unused_files(app.video_queue, app.audio_queue))
+    asyncio.create_task(
+        file_service.remove_unused_files(app.video_queue, app.audio_queue)
+    )
 
     yield
 
@@ -47,10 +51,10 @@ app = FastAPI(
 )
 
 
-origins = ["http://localhost:3000"]
+allowed_origins = [settings.settings.FRONTEND_ORIGIN]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

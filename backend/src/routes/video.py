@@ -1,74 +1,22 @@
-import uuid
 import json
-from fastapi import APIRouter, File, Header, Depends, UploadFile, Request, HTTPException
-from ..config.settings import settings
-from ..utils.file import get_video_file_path
-from pathlib import Path
+from fastapi import APIRouter, Depends, UploadFile, Request, HTTPException
+from ..services import video as video_service
 
 router = APIRouter()
 
 
-def check_upload_allowed(req: Request):
-    if len(req.app.video_queue) == settings.MAX_QUEUE_LENGTH:
-        print("ERROR: Video upload limit reached")
-        raise HTTPException(
-            status_code=429,
-            detail="Video upload limit reached. Please try again later.",
-        )
-
-
-async def valid_content_length(
-    content_length: int = Header(..., lt=settings.FILE_SIZE_LIMIT),
-):
-    return content_length
-
-
 @router.get("/video/upload-allowed")
 def video_upload_allowed(req: Request):
-    check_upload_allowed(req)
+    video_service.check_upload_allowed(req)
 
     return {"message": "Upload allowed"}
 
 
-@router.post("/video/upload", dependencies=[Depends(valid_content_length)])
-def upload_video(req: Request, video: UploadFile = File(...)):
-    check_upload_allowed(req)
+@router.post("/video/upload", dependencies=[Depends(video_service.validate_content_length)])
+async def upload_video(req: Request, video: UploadFile):
+    video_service.check_upload_allowed(req)
 
-    user_id = str(uuid.uuid4())
-
-    try:
-        contents = video.file.read()
-        output_file = Path(get_video_file_path(user_id, video.filename, "mp4"))
-        output_file.parent.mkdir(exist_ok=True, parents=True)
-
-        with open(output_file, "wb") as f:
-            f.write(contents)
-    except Exception as err:
-        print("ERROR: Error uploading file")
-        print(err)
-        raise HTTPException(
-            status_code=500,
-            detail="There was an error uploading the file. Please try again.",
-        )
-    finally:
-        video.file.close()
-
-    video_info = {
-        "user_id": user_id,
-        "filename": video.filename,
-        "file_ext": "mp4",
-    }
-    req.app.video_queue.append(video_info)
-
-    print(f"INFO: Added video to queue - {video_info}")
-    req.app.pusher_client.trigger(
-        channels=user_id,
-        event_name="transcribe-status",
-        data={
-            "message": "Waiting to convert video...",
-            "type": "info",
-        },
-    )
+    user_id = await video_service.add_video_to_queue(video, req.app.video_queue, req.app.pusher_client)
 
     return {
         "userId": f"{user_id}",

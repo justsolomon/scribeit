@@ -1,51 +1,16 @@
-import os
 import asyncio
 import subprocess
 import json
 import glob
-from pathlib import Path
 from collections import deque
 from pusher.pusher_client import PusherClient
 from whisper import Whisper
 from redis import Redis
 from ..config.settings import settings
-from .file import get_video_file_path, get_audio_file_path, get_storage_filename
+from ..utils import file as file_utils
 
 
-def is_file_in_queue(filename: str, queue: deque) -> bool:
-    return any(
-        filename == get_storage_filename(item["filename"], item["file_ext"])
-        for item in queue
-    )
-
-
-def is_video(file_path: str) -> bool:
-    return file_path.endswith(".mp4")
-
-
-def is_audio(file_path: str) -> bool:
-    return file_path.endswith(".ogg")
-
-
-def create_parent_directory(file_path: str) -> None:
-    file = Path(file_path)
-    file.parent.mkdir(exist_ok=True, parents=True)
-
-
-def convert_video(
-    video_file_path: str,
-    audio_file_path: str,
-) -> None:
-    convert_video_command = f"ffmpeg -i {video_file_path} -vn -map_metadata -1 -ac 1 -c:a libopus -b:a 12k -application voip {audio_file_path}"
-    split_audio_command = f"ffmpeg -i {audio_file_path} -f segment -segment_time 30 -c copy {audio_file_path}_%03d.ogg"
-
-    subprocess.check_output(convert_video_command, stderr=subprocess.STDOUT, shell=True)
-    print(f"INFO: Successfully converted {video_file_path} to {audio_file_path}")
-
-    subprocess.check_output(split_audio_command, stderr=subprocess.STDOUT, shell=True)
-
-
-async def video_to_audio(
+async def convert_video_to_audio(
     video_queue: deque, audio_queue: deque, pusher_client: PusherClient
 ) -> None:
     print("INFO: Waiting for uploaded videos...")
@@ -62,8 +27,8 @@ async def video_to_audio(
             )
 
             video_file_path, audio_file_path = (
-                get_video_file_path(**video),
-                get_audio_file_path(user_id, video["filename"]),
+                file_utils.get_video_file_path(**video),
+                file_utils.get_audio_file_path(user_id, video["filename"]),
             )
 
             try:
@@ -80,10 +45,10 @@ async def video_to_audio(
                 )
                 pass
             else:
-                create_parent_directory(audio_file_path)
+                file_utils.create_parent_directory(audio_file_path)
 
                 try:
-                    convert_video(video_file_path, audio_file_path)
+                    file_utils.convert_video(video_file_path, audio_file_path)
 
                     split_audio_files = glob.glob(f"{audio_file_path}_*.ogg")
                     print(
@@ -172,25 +137,5 @@ async def transcribe_audio(
                 )
             finally:
                 audio_queue.popleft()
-
-        await asyncio.sleep(settings.ASYNCIO_DELAY)
-
-
-async def remove_unused_files(video_queue: deque, audio_queue: deque) -> None:
-    print("INFO: Waiting for unused files...")
-
-    while True:
-        for subdir, _, files in os.walk("files"):
-            for filename in files:
-                file_path = os.path.join(subdir, filename)
-
-                if (
-                    is_video(file_path) and not is_file_in_queue(filename, video_queue)
-                ) or (
-                    is_audio(file_path) and not is_file_in_queue(filename, audio_queue)
-                ):
-                    file_obj = Path(file_path)
-                    file_obj.unlink(missing_ok=True)
-                    print(f"INFO: Deleted unused file - {file_path}")
 
         await asyncio.sleep(settings.ASYNCIO_DELAY)
