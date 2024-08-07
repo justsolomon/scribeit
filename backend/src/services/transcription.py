@@ -72,6 +72,7 @@ async def convert_video_to_audio(
                     print(
                         f"ERROR: An error occurred while converting {video_file_path} to {audio_file_path}"
                     )
+                    print(f"Error message: {e.output.decode()}")
                     pusher_client.trigger(
                         channels=user_id,
                         event_name="transcribe-status",
@@ -80,7 +81,6 @@ async def convert_video_to_audio(
                             "type": "error",
                         },
                     )
-                    print(f"Error message: {e.output.decode()}")
 
             video_queue.popleft()
 

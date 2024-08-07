@@ -1,0 +1,18 @@
+services:
+  frontend:
+    image: node:22-alpine
+    working_dir: /frontend
+    command: sh -c "yarn install && yarn start"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/frontend
+  
+  backend:
+    image: python:3.9-slim
+    working_dir: /backend
+    command: sh -c "apt-get update && apt-get install -y ffmpeg && pip install -r requirements.txt && fastapi run src/app.py"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/backend
