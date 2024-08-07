@@ -38,6 +38,36 @@ You also need secrets from the following providers to continue. To see the exact
 
 ### Running locally
 
+#### Using Docker Compose
+
+To run the app locally, follow the steps below:
+
+1. Clone the repository to your PC using your terminal. For more info, refer to this [article.](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository-from-github/cloning-a-repository)
+
+2. After cloning, navigate into the repo using the command:
+
+   ```
+   cd scribeit
+   ```
+
+3. Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) up and running on your PC.
+
+4. Setup the project using the command:
+
+   ```
+   ./bin/setup
+   ```
+
+5. Once the command above runs, a new `.env` file will be generated at the root of both the `backend` and `frontend` folders. Configure your environment variables with your values in the `backend/.env` and `frontend/.env` files.
+
+6. Run the app using the command:
+
+   ```
+   ./bin/start
+   ```
+
+#### Without Docker
+
 To run the app locally, follow the steps below:
 
 1. Clone the repository to your PC using your terminal. For more info, refer to this [article.](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository-from-github/cloning-a-repository)
@@ -69,7 +99,7 @@ To run the app locally, follow the steps below:
 6. Once you are in the virtual environment, you can setup the project using the command:
 
    ```
-   ./bin/setup
+   ./bin/setup-no-docker
    ```
 
 7. Once the command above runs, a new `.env` file will be generated at the root of both the `backend` and `frontend` folders. Configure your environment variables with your values in the `backend/.env` and `frontend/.env` files.
@@ -77,7 +107,7 @@ To run the app locally, follow the steps below:
 8. After adding the environment variables, run the app in your terminal using the command:
 
    ```
-   source backend/.venv/bin/activate && ./bin/start
+   source backend/.venv/bin/activate && ./bin/start-no-docker
    ```
 
 **PS:** If the virtual environment is already activated, you can simply use the `./bin/start` command to run the app.

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+get_abs_filename() {
+  # $1 : relative filename
+  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+}
+
+# BACKEND
+cd backend
+
+# create .env file
+cp .env.sample .env
+
+# install dependencies
+python -m pip install -r requirements.txt
+cd ..
+
+
+# FRONTEND
+cd frontend
+
+# create .env file
+cp .env.sample .env
+
+# install dependencies
+yarn install
+cd ..
+
+# configure vscode settings
+VENV_PATH=$(get_abs_filename "backend/.venv/bin/python")
+rm -rf .vscode
+mkdir .vscode
+printf "\n{
+        \"editor.formatOnSave\": true,\n\
+        \"python.defaultInterpreterPath\": \"${VENV_PATH}\",\n\
+        \"python.terminal.activateEnvironment\": true\n\
+        }"\
+        > .vscode/settings.json
